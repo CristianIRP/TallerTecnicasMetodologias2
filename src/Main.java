@@ -34,9 +34,9 @@
  *     con un muro de bloqueo (X) sin haber alcanzado el objetivo (T)
  */
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.io.IOException;
 
 public class Main {
     static Scanner in = new Scanner(System.in);
@@ -59,6 +59,9 @@ public class Main {
         imprimirMatriz(matriz);
         // Pedimos al usuario la cantidad de muros y sus respectivas posiciones
         posicionMuros(matriz);
+        imprimirMatriz(matriz);
+        // Pedimos al usuario que posiciones los espejos
+        posicionEspejos(matriz);
         imprimirMatriz(matriz);
 
 
@@ -198,7 +201,83 @@ public class Main {
         } catch (InputMismatchException e) {
             System.out.println("Error: Texto identificado, ingrese unos valores válidos.");
             in.nextLine();
+
         }
     }
 
+    /**
+     * Metodo encargado de configurar los tipos de espejos que el usuario escoja.
+     *
+     * @return array con los 4 tipos de espejo seleccionados.
+     */
+    public static String[] tipoEspejos() {
+        int cantEspejoA;
+        String[] tiposEspejo = new String[4];
+        while (true) {
+            try {
+                // Solicitar al usuario la cantidad de cada tipo de espejo
+                System.out.println("Cuántos espejos del tipo (/) o (\\\\) desea ingresar (total espejos máximo 4):  ");
+                System.out.println("Cantidad de espejos (/):");
+                cantEspejoA = in.nextInt();
+                if (cantEspejoA <= 4 && cantEspejoA >= 0) {
+                    break;
+                } else {
+                    System.out.println("Ingrese una cantidad válida.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Texto identificado, ingrese un valor válido.");
+                in.nextLine();
+            }
+        }
+        // Guardamos los espejos en un array
+        for (int i = 0; i < tiposEspejo.length; i++) {
+            if (i < cantEspejoA) {
+                tiposEspejo[i] = "/";
+            } else {
+                tiposEspejo[i] = "\\";
+            }
+        }
+        return tiposEspejo;
+    }
+
+    /**
+     * Metodo que posiciona los espejos configurados por el usuario anteriormente,
+     * se le pregunta a este mismo las coordenadas de cada uno en la matriz.
+     *
+     * @param matriz principal utilizada en el sistema.
+     */
+    public static void posicionEspejos(String[][] matriz) {
+        int fEspejo;
+        int cEspejo;
+        String[] tiposEspejo = tipoEspejos();
+        System.out.println("Espejos disponibles: " + Arrays.toString(tiposEspejo));
+        // Solicitar al usuario que ingrese los espejos
+        System.out.println("A continuación ingrese las coordenadas de los espejos en la matriz: ");
+        for (int i = 1; i < 5; i++) {
+            while (true) {
+                try {
+                    System.out.println("Ingrese la fila del espejo Nro " + i + " (1 a 5):");
+                    fEspejo = in.nextInt();
+                    System.out.println("Ingrese la columna del espejo Nro " + i + " (1 a 5):");
+                    cEspejo = in.nextInt();
+                    // Validamos que haya ingresado coordenadas dentro del rango
+                    if (fEspejo <= 5 && fEspejo >= 1 && cEspejo <= 5 && cEspejo >= 1) {
+                        // Validamos que las coordenadas ingresadas esten despejadas
+                        if (matriz[fEspejo - 1][cEspejo - 1].equalsIgnoreCase("-")) {
+                            // Ubicamos el espejo en la matriz
+                            matriz[fEspejo - 1][cEspejo - 1] = tiposEspejo[i - 1];
+                            break;
+                        } else {
+                            System.out.println("Error: Coordenadas ya ocupadas, ingrese unas diferentes.");
+                        }
+                    } else {
+                        System.out.println("Ingrese unas coordenadas validas.");
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Error: Texto identificado, ingrese un valor válido.");
+                    in.nextLine();
+                }
+            }
+        }
+    }
 }
