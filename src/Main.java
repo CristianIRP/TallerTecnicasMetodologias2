@@ -40,6 +40,8 @@ import java.util.Scanner;
 
 public class Main {
     static Scanner in = new Scanner(System.in);
+    static int cLaser;
+    static int fLaser;
 
     public static void main(String[] args) {
         // Creando la matriz
@@ -60,9 +62,14 @@ public class Main {
         // Pedimos al usuario la cantidad de muros y sus respectivas posiciones
         posicionMuros(matriz);
         imprimirMatriz(matriz);
-        // Pedimos al usuario que posiciones los espejos
-        posicionEspejos(matriz);
-        imprimirMatriz(matriz);
+        // espejo seleccionados por el usuario
+        String[] espejosSeleccionados = tipoEspejos();
+        // Probamos configuración de espejos
+        if (posicionEspejos(matriz, espejosSeleccionados)) {
+            System.out.println("Configuración encontrada.");
+        } else {
+            System.out.println("Fallido, no se encontró una configuración adecuada");
+        }
 
 
     }
@@ -89,8 +96,6 @@ public class Main {
      * @param matriz principal utilizada en el sistema.
      */
     public static void posicionLaser(String[][] matriz) {
-        int cLaser;
-        int fLaser;
         //Preguntamos al usuario la posicion inicial del Laser
         System.out.println("A continuacion ingrese las coordenadas iniciales del Laser: ");
         while (true) {
@@ -241,43 +246,90 @@ public class Main {
     }
 
     /**
-     * Metodo que posiciona los espejos configurados por el usuario anteriormente,
-     * se le pregunta a este mismo las coordenadas de cada uno en la matriz.
+     * Metodo encargado de simular la trayectoria del laser.
      *
-     * @param matriz principal utilizada en el sistema.
+     * @param matriz principal del sistema
+     * @return true si se logró alcanazar el target,
+     * false si fallo
+     *
      */
-    public static void posicionEspejos(String[][] matriz) {
-        int fEspejo;
-        int cEspejo;
-        String[] tiposEspejo = tipoEspejos();
-        System.out.println("Espejos disponibles: " + Arrays.toString(tiposEspejo));
-        // Solicitar al usuario que ingrese los espejos
-        System.out.println("A continuación ingrese las coordenadas de los espejos en la matriz: ");
-        for (int i = 1; i < 5; i++) {
-            while (true) {
-                try {
-                    System.out.println("Ingrese la fila del espejo Nro " + i + " (1 a 5):");
-                    fEspejo = in.nextInt();
-                    System.out.println("Ingrese la columna del espejo Nro " + i + " (1 a 5):");
-                    cEspejo = in.nextInt();
-                    // Validamos que haya ingresado coordenadas dentro del rango
-                    if (fEspejo <= 5 && fEspejo >= 1 && cEspejo <= 5 && cEspejo >= 1) {
-                        // Validamos que las coordenadas ingresadas esten despejadas
-                        if (matriz[fEspejo - 1][cEspejo - 1].equalsIgnoreCase("-")) {
-                            // Ubicamos el espejo en la matriz
-                            matriz[fEspejo - 1][cEspejo - 1] = tiposEspejo[i - 1];
-                            break;
-                        } else {
-                            System.out.println("Error: Coordenadas ya ocupadas, ingrese unas diferentes.");
-                        }
-                    } else {
-                        System.out.println("Ingrese unas coordenadas validas.");
-                    }
-                } catch (InputMismatchException e) {
-                    System.out.println("Error: Texto identificado, ingrese un valor válido.");
-                    in.nextLine();
+    public static boolean trayectoriaLaser(String[][] matriz) {
+        int fInicial = fLaser;
+        int cInicial = cLaser;
+        int direccion = 1;
+        // Ciclo para ir avanzando casillas
+        while (true) {
+            // Si la direccion es 1 (este)
+            if (direccion == 1) {
+                cInicial++;
+            }
+            // Si la direccion es 2 (oeste)
+            else if (direccion == 2) {
+                cInicial--;
+            }
+            // Si la direccion es 3 (norte)
+            else if (direccion == 3) {
+                fInicial++;
+            }
+            // Si la direccion es 4 (sur)
+            else if (direccion == 4) {
+                fInicial--;
+            }
+
+            // Comprobar que el laser siga dentro de la matriz
+            if (fInicial < 0 || fInicial >= 5 || cInicial < 0 || cInicial >= 5) {
+                return false;
+            }
+            // Posicion actual dentro de la matriz
+            String casilla = matriz[fInicial][cInicial];
+            // Caso estemos en target
+            if (casilla.equalsIgnoreCase("T")) {
+                return true;
+            }
+            // Caso chocamos con un muro
+            if (casilla.equalsIgnoreCase("X")) {
+                return false;
+            }
+            // Caso choquemos con un espejo
+            if (casilla.equalsIgnoreCase("/")) {
+                if (direccion == 1) {
+                    direccion = 4;
+                } else if (direccion == 2) {
+                    direccion = 3;
+                } else if (direccion == 3) {
+                    direccion = 2;
+                } else if (direccion == 4) {
+                    direccion = 1;
+                }
+            }
+            if (casilla.equalsIgnoreCase("\\\\")) {
+                if (direccion == 2) {
+                    direccion = 4;
+                } else if (direccion == 1) {
+                    direccion = 3;
+                } else if (direccion == 3) {
+                    direccion = 1;
+                } else if (direccion == 4) {
+                    direccion = 2;
                 }
             }
         }
+
+
     }
+
+    /**
+     * Metodo que mediante backtracking posiciona los espejos configurados
+     * por el usuario anteriormente.
+     *
+     * @param matriz principal utilizada en el sistema.
+     */
+    public static boolean posicionEspejos(String[][] matriz, String[] tiposEspejos) {
+        // Caso base
+        if () {
+
+        }
+
+    }
+
 }
