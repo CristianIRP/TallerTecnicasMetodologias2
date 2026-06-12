@@ -65,7 +65,7 @@ public class Main {
         // espejo seleccionados por el usuario
         String[] espejosSeleccionados = tipoEspejos();
         // Probamos configuración de espejos
-        if (posicionEspejos(matriz, espejosSeleccionados)) {
+        if (posicionEspejos(matriz, espejosSeleccionados,0)) {
             System.out.println("Configuración encontrada.");
         } else {
             System.out.println("Fallido, no se encontró una configuración adecuada");
@@ -80,13 +80,13 @@ public class Main {
      * @param matriz principal.
      */
     public static void imprimirMatriz(String[][] matriz) {
-        for (String[] row : matriz) {
-            for (String cell : row) {
-                System.out.print(cell + " ");
+        System.out.println(" 1 2 3 4 5");
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                System.out.print(matriz[i][j] + " ");
             }
             System.out.println();
         }
-
     }
 
     /**
@@ -101,19 +101,19 @@ public class Main {
         while (true) {
             try {
                 System.out.println("Ingrese la fila del laser (1 a 5): ");
-                fLaser = in.nextInt();
+                fLaser = in.nextInt() -1;
                 System.out.println("Ingrese la columna del laser (1 a 4): ");
-                cLaser = in.nextInt();
-                // Validamos que las coordenadas esten dentro del rango
-                if (cLaser <= 4 && cLaser >= 1 && fLaser <= 5 && fLaser >= 1) {
+                cLaser = in.nextInt() -1;
+                // validar que las coordenadas esten dentro del rango
+                if (cLaser <= 4 && cLaser >= 0 && fLaser <= 4 && fLaser >= 0) {
                     // Ingresamos el laser a la matriz
-                    matriz[fLaser - 1][cLaser - 1] = "L";
+                    matriz[fLaser][cLaser] = "L";
                     break;
                 } else {
-                    System.out.println("Ingrese un valor válido.");
+                    System.out.println("Ingrese un valor valido (1 a 5)");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Error: Texto identificado, ingrese unos valores válidos.");
+                System.out.println("Error: Texto identificado, ingrese unos valores validos.");
                 in.nextLine();
             }
         }
@@ -134,21 +134,21 @@ public class Main {
         while (true) {
             try {
                 System.out.println("Ingrese la fila del target (1 a 5): ");
-                fTarget = in.nextInt();
+                fTarget = in.nextInt() -1;
                 System.out.println("Ingrese la columna del target (1 a 5): ");
-                cTarget = in.nextInt();
+                cTarget = in.nextInt() -1;
                 // Validamos que las coordenadas esten dentro del rango
-                if (fTarget <= 5 && fTarget >= 1 && cTarget <= 5 && cTarget >= 1) {
+                if (fTarget <= 4 && fTarget >= 0 && cTarget <= 4 && cTarget >= 0) {
                     // Nos aseguramos de que no repita coordenadas ya utilizadas
-                    if (matriz[fTarget - 1][cTarget - 1].equalsIgnoreCase("-")) {
+                    if (matriz[fTarget][cTarget].equalsIgnoreCase("-")) {
                         // Ingresamos el target a la matriz
-                        matriz[fTarget - 1][cTarget - 1] = "T";
+                        matriz[fTarget][cTarget] = "T";
                         break;
                     } else {
                         System.out.println("Error: Coordenadas ya utilizadas.");
                     }
                 } else {
-                    System.out.println("Ingrese unos valores validos.");
+                    System.out.println("Ingrese valores validos.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Error: Texto identificado, ingrese unos valores válidos.");
@@ -186,14 +186,14 @@ public class Main {
             for (int i = 0; i < cantidadMuros; i++) {
                 while (true) {
                     System.out.println("Ingrese la fila del muro " + (i + 1) + " (1 a 5): ");
-                    int fMuro = in.nextInt();
+                    int fMuro = in.nextInt()-1;
                     System.out.println("Ingrese la columna del muro " + (i + 1) + " (1 a 5): ");
-                    int cMuro = in.nextInt();
+                    int cMuro = in.nextInt()-1;
                     // Validamos que haya ingresado coordenadas dentro del rango
-                    if (fMuro <= 5 && fMuro >= 1 && cMuro <= 5 && cMuro >= 1) {
+                    if (fMuro <= 4 && fMuro >= 0 && cMuro <= 4 && cMuro >= 0) {
                         // Ver si esa posicion esta vacia
-                        if (matriz[fMuro - 1][cMuro - 1].equalsIgnoreCase("-")) {
-                            matriz[fMuro - 1][cMuro - 1] = "X";
+                        if (matriz[fMuro][cMuro].equalsIgnoreCase("-")) {
+                            matriz[fMuro][cMuro] = "X";
                             break;
                         } else {
                             System.out.println("Error: Coordenadas ya ocupadas, ingrese unas diferentes.");
@@ -221,7 +221,7 @@ public class Main {
         while (true) {
             try {
                 // Solicitar al usuario la cantidad de cada tipo de espejo
-                System.out.println("Cuántos espejos del tipo (/) o (\\\\) desea ingresar (total espejos máximo 4):  ");
+                System.out.println("Cuántos espejos del tipo (/) o (\\) desea ingresar (total espejos máximo 4):  ");
                 System.out.println("Cantidad de espejos (/):");
                 cantEspejoA = in.nextInt();
                 if (cantEspejoA <= 4 && cantEspejoA >= 0) {
@@ -256,7 +256,7 @@ public class Main {
     public static boolean trayectoriaLaser(String[][] matriz) {
         int fInicial = fLaser;
         int cInicial = cLaser;
-        int direccion = 1;
+        int direccion = 1; // 1 representa Este, 2 Oeste, 3 Norte y 4 Sur
         // Ciclo para ir avanzando casillas
         while (true) {
             // Si la direccion es 1 (este)
@@ -269,11 +269,11 @@ public class Main {
             }
             // Si la direccion es 3 (norte)
             else if (direccion == 3) {
-                fInicial++;
+                fInicial--;
             }
             // Si la direccion es 4 (sur)
             else if (direccion == 4) {
-                fInicial--;
+                fInicial++;
             }
 
             // Comprobar que el laser siga dentro de la matriz
@@ -287,30 +287,30 @@ public class Main {
                 return true;
             }
             // Caso chocamos con un muro
-            if (casilla.equalsIgnoreCase("X")) {
+            if (casilla.equalsIgnoreCase("X") || casilla.equalsIgnoreCase("L")) {
                 return false;
             }
             // Caso choquemos con un espejo
             if (casilla.equalsIgnoreCase("/")) {
-                if (direccion == 1) {
-                    direccion = 4;
-                } else if (direccion == 2) {
+                if (direccion == 1) { // Viene del oeste y sale al norte
                     direccion = 3;
-                } else if (direccion == 3) {
+                } else if (direccion == 2) { // Viene del este y sale al sur
+                    direccion = 4;
+                } else if (direccion == 1) { // Viene del sur y sale al este
                     direccion = 2;
-                } else if (direccion == 4) {
+                } else if (direccion == 4) { // Viene del norte y sale al oeste
                     direccion = 1;
                 }
             }
-            if (casilla.equalsIgnoreCase("\\\\")) {
-                if (direccion == 2) {
+            if (casilla.equalsIgnoreCase("\\")) {
+                if (direccion == 1) { // Viene del Oeste y sale al sur
                     direccion = 4;
-                } else if (direccion == 1) {
+                } else if (direccion == 2) { //Viene del este y sale al norte
                     direccion = 3;
-                } else if (direccion == 3) {
-                    direccion = 1;
-                } else if (direccion == 4) {
+                } else if (direccion == 3) { // Viene del sur y sale al oeste
                     direccion = 2;
+                } else if (direccion == 4) { // Viene del norte y sale al este
+                    direccion = 1;
                 }
             }
         }
@@ -321,15 +321,30 @@ public class Main {
     /**
      * Metodo que mediante backtracking posiciona los espejos configurados
      * por el usuario anteriormente.
-     *
+     * @param tiposEspejos Array con los espejos a posicionar
+     * @param indexEspejo Indice del espejo que estamos intentando colocar
      * @param matriz principal utilizada en el sistema.
      */
-    public static boolean posicionEspejos(String[][] matriz, String[] tiposEspejos) {
+    public static boolean posicionEspejos(String[][] matriz, String[] tiposEspejos, int indexEspejo) {
         // Caso base
-        if () {
-
+        if (indexEspejo >= tiposEspejos.length) {
+            return trayectoriaLaser(matriz);
         }
-
+        for (int f = 0; f<5; f++){
+            for (int c = 0; c<5; c++){
+                // colocamos el espejo solo en las celdas vacias
+                if(matriz[f][c].equals("-")){
+                    matriz[f][c] = tiposEspejos[indexEspejo]; // ponemos el espejo
+                    // Llamada recursiva para el siguiente espejo
+                    if (posicionEspejos(matriz, tiposEspejos, indexEspejo + 1)) {
+                        return true;
+                    }
+                    // Backtracking: quitamos el espejo
+                    matriz[f][c] = "-";
+                }
+            }
+        }
+        return false;
     }
 
 }
