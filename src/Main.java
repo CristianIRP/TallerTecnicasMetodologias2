@@ -67,6 +67,7 @@ public class Main {
         // Probamos configuración de espejos
         if (posicionEspejos(matriz, espejosSeleccionados,0)) {
             System.out.println("Configuración encontrada.");
+            imprimirMatriz(matriz);
         } else {
             System.out.println("Fallido, no se encontró una configuración adecuada");
         }
@@ -102,7 +103,7 @@ public class Main {
             try {
                 System.out.println("Ingrese la fila del laser (1 a 5): ");
                 fLaser = in.nextInt() -1;
-                System.out.println("Ingrese la columna del laser (1 a 4): ");
+                System.out.println("Ingrese la columna del laser (1 a 5): ");
                 cLaser = in.nextInt() -1;
                 // validar que las coordenadas esten dentro del rango
                 if (cLaser <= 4 && cLaser >= 0 && fLaser <= 4 && fLaser >= 0) {
@@ -253,69 +254,66 @@ public class Main {
      * false si fallo
      *
      */
+    /**
+     * Metodo encargado de simular la trayectoria del laser.
+     *
+     * @param matriz principal del sistema
+     * @return true si se logró alcanzar el target, false si fallo
+     */
     public static boolean trayectoriaLaser(String[][] matriz) {
         int fInicial = fLaser;
         int cInicial = cLaser;
-        int direccion = 1; // 1 representa Este, 2 Oeste, 3 Norte y 4 Sur
-        // Ciclo para ir avanzando casillas
-        while (true) {
-            // Si la direccion es 1 (este)
-            if (direccion == 1) {
-                cInicial++;
-            }
-            // Si la direccion es 2 (oeste)
-            else if (direccion == 2) {
-                cInicial--;
-            }
-            // Si la direccion es 3 (norte)
-            else if (direccion == 3) {
-                fInicial--;
-            }
-            // Si la direccion es 4 (sur)
-            else if (direccion == 4) {
-                fInicial++;
-            }
+        int direccion = 1; // 1: Este, 2: Oeste, 3: Norte, 4: Sur
 
-            // Comprobar que el laser siga dentro de la matriz
+        int posicion = 0;
+        int posicionMax = 100; // Evita bucles infinitos en circuitos cerrados
+
+        while (posicion < posicionMax) {
+            // 1. Validar límites ANTES de leer cualquier posición en la matriz
             if (fInicial < 0 || fInicial >= 5 || cInicial < 0 || cInicial >= 5) {
                 return false;
             }
-            // Posicion actual dentro de la matriz
+
+            // 2. Obtener el elemento de la celda actual
             String casilla = matriz[fInicial][cInicial];
-            // Caso estemos en target
+
+            // 3. Evaluar condiciones de Victoria o Fracaso
             if (casilla.equalsIgnoreCase("T")) {
-                return true;
+                return true; // Éxito: Llegó al objetivo
             }
-            // Caso chocamos con un muro
-            if (casilla.equalsIgnoreCase("X") || casilla.equalsIgnoreCase("L")) {
+            // Permite estar en "L" solo en el paso 0. Si regresa a "L" después, es un bucle/fallo.
+            if (casilla.equalsIgnoreCase("X") || (casilla.equalsIgnoreCase("L") && posicion > 0)) {
                 return false;
             }
-            // Caso choquemos con un espejo
+
+            // 4. Lógica de refracción (Modifica la dirección en la celda actual)
             if (casilla.equalsIgnoreCase("/")) {
-                if (direccion == 1) { // Viene del oeste y sale al norte
-                    direccion = 3;
-                } else if (direccion == 2) { // Viene del este y sale al sur
-                    direccion = 4;
-                } else if (direccion == 1) { // Viene del sur y sale al este
-                    direccion = 2;
-                } else if (direccion == 4) { // Viene del norte y sale al oeste
-                    direccion = 1;
-                }
+                if (direccion == 1)      direccion = 3; // Oeste -> Norte
+                else if (direccion == 2) direccion = 4; // Este -> Sur
+                else if (direccion == 3) direccion = 1; // Sur -> Este
+                else if (direccion == 4) direccion = 2; // Norte -> Oeste
             }
-            if (casilla.equalsIgnoreCase("\\")) {
-                if (direccion == 1) { // Viene del Oeste y sale al sur
-                    direccion = 4;
-                } else if (direccion == 2) { //Viene del este y sale al norte
-                    direccion = 3;
-                } else if (direccion == 3) { // Viene del sur y sale al oeste
-                    direccion = 2;
-                } else if (direccion == 4) { // Viene del norte y sale al este
-                    direccion = 1;
-                }
+            else if (casilla.equalsIgnoreCase("\\")) {
+                if (direccion == 1)      direccion = 4; // Oeste -> Sur
+                else if (direccion == 2) direccion = 3; // Este -> Norte
+                else if (direccion == 3) direccion = 1; // Sur -> Oeste
+                else if (direccion == 4) direccion = 2; // Norte -> Este
             }
+
+            // 5. MOVIMIENTO: Se calcula la siguiente celda al final de la iteración actual
+            if (direccion == 1) {
+                cInicial++;
+            } else if (direccion == 2) {
+                cInicial--;
+            } else if (direccion == 3) {
+                fInicial--;
+            } else if (direccion == 4) {
+                fInicial++;
+            }
+
+            posicion++;
         }
-
-
+        return false;
     }
 
     /**
@@ -327,7 +325,7 @@ public class Main {
      */
     public static boolean posicionEspejos(String[][] matriz, String[] tiposEspejos, int indexEspejo) {
         // Caso base
-        if (indexEspejo >= tiposEspejos.length) {
+        if (indexEspejo == 4) {
             return trayectoriaLaser(matriz);
         }
         for (int f = 0; f<5; f++){
