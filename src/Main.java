@@ -254,12 +254,6 @@ public class Main {
      * false si fallo
      *
      */
-    /**
-     * Metodo encargado de simular la trayectoria del laser.
-     *
-     * @param matriz principal del sistema
-     * @return true si se logró alcanzar el target, false si fallo
-     */
     public static boolean trayectoriaLaser(String[][] matriz) {
         int fInicial = fLaser;
         int cInicial = cLaser;
